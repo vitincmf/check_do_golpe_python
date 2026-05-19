@@ -1,0 +1,129 @@
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Check do Golpe</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main class="phone">
+        <section id="startScreen" class="screen active hero">
+            <div class="top-bubbles"></div>
+            <div class="hero-content">
+                <h1>Cuidado com<br>os Golpes!</h1>
+                <p>Teste seus conhecimentos e aprenda a identificar fraudes digitais.</p>
+            </div>
+
+            <div class="stats-card">
+                <div><strong id="totalQuestions">10</strong><span>Questões</span></div>
+                <div><strong>100%</strong><span>Gratuito</span></div>
+                <div><strong>⚡</strong><span>Rápido</span></div>
+            </div>
+
+            <div class="card">
+                <h2>Pronto para o desafio?</h2>
+                <p>Analise os casos, descubra se são legítimos ou armadilhas digitais.</p>
+                <button class="primary" onclick="startQuiz()">Iniciar Quiz</button>
+                <button class="secondary" onclick="showAuth()">Entrar / Criar conta →</button>
+                <small>Nenhum cadastro é necessário para jogar.</small>
+            </div>
+        </section>
+
+        <section id="questionScreen" class="screen">
+            <header class="quiz-header">
+                <button onclick="goHome()" class="link">← Voltar</button>
+                <span id="questionCounter">Questão 1/10</span>
+                <button onclick="showHint()" class="link">💡 Dica</button>
+            </header>
+            <div class="progress"><div id="progressBar"></div></div>
+            <div class="points-pill">⭐ <span id="scoreNow">0</span> pts</div>
+
+            <article class="site-card">
+                <div class="browser">
+                    <span></span><span></span><span></span>
+                    <input id="fakeUrl" readonly>
+                </div>
+                <div class="store-head">
+                    <b id="storeName"></b>
+                    <span>🔎 🛒 ☰</span>
+                </div>
+                <div class="product-image" id="productImage">📱</div>
+                <h3 id="productName"></h3>
+                <p class="price" id="price"></p>
+                <p class="payment" id="payment"></p>
+            </article>
+
+            <h2 id="questionTitle"></h2>
+            <button class="answer danger" onclick="answerQuestion('Golpe')">🚨 É um Golpe!<small>O site parece falso ou suspeito</small></button>
+            <button class="answer success" onclick="answerQuestion('Seguro')">✅ É Seguro!<small>Parece um site confiável</small></button>
+
+            <div id="hintBox" class="hint hidden"></div>
+            <p class="tap-note">Responda para continuar</p>
+        </section>
+
+        <section id="feedbackScreen" class="screen">
+            <div id="feedbackTop" class="feedback-top">
+                <div id="feedbackIcon" class="big-icon">✅</div>
+                <h1 id="feedbackTitle"></h1>
+            </div>
+            <div class="card feedback-card">
+                <h3 id="feedbackSubtitle"></h3>
+                <div id="signalsList" class="chips"></div>
+                <p id="feedbackText"></p>
+                <div class="score-line">⭐ Pontuação atual: <b id="feedbackScore">0</b> pts</div>
+                <button class="primary" onclick="nextQuestion()">Próxima Questão →</button>
+            </div>
+        </section>
+
+        <section id="resultScreen" class="screen hero">
+            <div class="trophy">🏆</div>
+            <h1>Quiz Concluído!</h1>
+            <p>Você provou que sabe identificar fraudes digitais.</p>
+
+            <div class="result-card">
+                <p>Sua Pontuação</p>
+                <h2><span id="finalScore">0</span> pontos</h2>
+                <p><span id="finalCorrect">0</span> de <span id="finalTotal">10</span> acertos • <span id="finalPercent">0</span>% de aproveitamento</p>
+            </div>
+
+            <div class="stats-card">
+                <div><strong id="resultCorrect">0</strong><span>Acertos</span></div>
+                <div><strong id="resultErrors">0</strong><span>Erros</span></div>
+                <div><strong id="resultHints">0</strong><span>Dicas</span></div>
+            </div>
+
+            <div class="card">
+                <p id="performanceMessage"></p>
+                <button class="primary" onclick="restartQuiz()">Jogar novamente</button>
+                <button class="secondary" onclick="showAuth()">Criar conta grátis</button>
+                <button class="secondary" onclick="showHistory()">Ver histórico</button>
+            </div>
+        </section>
+
+        <section id="authScreen" class="screen">
+            <header class="quiz-header"><button class="link" onclick="goHome()">← Voltar</button><span>Conta opcional</span><span></span></header>
+            <div class="card">
+                <h2>Entrar ou criar conta</h2>
+                <p>O cadastro é opcional. Ele serve apenas para salvar histórico entre dispositivos.</p>
+                <input id="email" placeholder="E-mail" type="email">
+                <input id="password" placeholder="Senha" type="password">
+                <button class="primary" onclick="login()">Entrar</button>
+                <button class="secondary" onclick="signup()">Criar conta</button>
+                <p id="authMessage"></p>
+            </div>
+            <div class="card">
+                <h3>Histórico</h3>
+                <div id="historyList">Entre na conta para ver seu histórico.</div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+      window.INITIAL_USER = {{ (user or '')|tojson }};
+    </script>
+    <script src="/static/app.js"></script>
+</body>
+</html>

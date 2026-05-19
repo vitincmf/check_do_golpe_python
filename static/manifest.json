@@ -1,0 +1,9 @@
+{
+  "name": "Check do Golpe",
+  "short_name": "CheckGolpe",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f1f4fb",
+  "theme_color": "#7662e8",
+  "icons": []
+}
