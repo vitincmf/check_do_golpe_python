@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6c5ce7">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="stylesheet" href="/static/css/style.css">
+<title>Feedback - Check do Golpe</title>
+</head>
+<body>
+<main class="app">
+<section class="card">
+    {% if dados.acertou %}
+        <div class="feedback correto">
+            <h1>Correto!</h1>
+            <p>Você identificou corretamente o cenário.</p>
+        </div>
+    {% else %}
+        <div class="feedback errado">
+            <h1>Ops! Era outra resposta.</h1>
+            <p>Essa questão serviu como aprendizado.</p>
+        </div>
+    {% endif %}
+
+    <small class="assunto">{{ questao.assunto }}</small>
+
+    <div class="site-fake">
+        <div class="browser-bar">{{ questao.url_simulada }}</div>
+        <h2>{{ questao.titulo }}</h2>
+        <p>{{ questao.descricao }}</p>
+    </div>
+
+    <h3>Explicação</h3>
+    <p>{{ questao.explicacao }}</p>
+
+    <div class="pontuacao">Pontuação obtida: <strong>{{ dados.pontos }} pontos</strong></div>
+
+    {% if dados.usou_dica %}
+        <p class="aviso">Você usou dica, por isso a pontuação foi reduzida.</p>
+    {% endif %}
+
+    <a href="/proxima" class="btn">Próxima Questão</a>
+</section>
+</main>
+<script src="/static/js/install.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/service-worker.js');
+}
+</script>
+</body>
+</html>

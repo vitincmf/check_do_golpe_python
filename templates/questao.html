@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6c5ce7">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="stylesheet" href="/static/css/style.css">
+<title>Questão - Check do Golpe</title>
+</head>
+<body>
+<main class="app">
+<section class="card">
+    <div class="topo">
+        <span>Questão {{ numero }}/{{ total }}</span>
+        <span>{{ questao.pontos }} pts</span>
+    </div>
+
+    <div class="barra">
+        <div class="progresso" style="width: {{ (numero / total) * 100 }}%;"></div>
+    </div>
+
+    <small class="assunto">{{ questao.assunto }}</small>
+
+    <div class="site-fake">
+        <div class="browser-bar">{{ questao.url_simulada }}</div>
+        <h2>{{ questao.titulo }}</h2>
+        <p>{{ questao.descricao }}</p>
+    </div>
+
+    <h3>Este site é legítimo ou uma armadilha?</h3>
+
+    <form action="/responder" method="POST">
+        <input type="hidden" name="questao_id" value="{{ questao.id }}">
+        <input type="hidden" name="usou_dica" id="usou_dica" value="0">
+
+        <button type="submit" name="resposta_usuario" value="golpe" class="opcao golpe">É um Golpe!</button>
+        <button type="submit" name="resposta_usuario" value="seguro" class="opcao seguro">É Seguro!</button>
+    </form>
+
+    <button class="dica-btn" onclick="mostrarDica()">Usar dica</button>
+    <div id="dica" class="dica escondido">{{ questao.dica }}</div>
+</section>
+</main>
+
+<script>
+function mostrarDica() {
+    document.getElementById("dica").classList.remove("escondido");
+    document.getElementById("usou_dica").value = "1";
+}
+</script>
+<script src="/static/js/install.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/service-worker.js');
+}
+</script>
+</body>
+</html>

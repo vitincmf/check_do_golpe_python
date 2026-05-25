@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6c5ce7">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="stylesheet" href="/static/css/style.css">
+<title>Cadastro - Check do Golpe</title>
+</head>
+<body>
+<main class="app">
+<section class="hero-card">
+    <h1>Criar conta</h1>
+    <p class="subtitle">Opcional. O quiz também funciona sem cadastro.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <label>Nome</label>
+        <input name="nome" required>
+
+        <label>E-mail</label>
+        <input name="email" type="email" required>
+
+        <label>Senha</label>
+        <input name="senha" type="password" required>
+
+        <label>Faixa etária</label>
+        <select name="faixa_etaria_id" required>
+            <option value="">Selecione</option>
+            {% for faixa in faixas %}
+                <option value="{{ faixa.id }}">{{ faixa.nome }}</option>
+            {% endfor %}
+        </select>
+
+        <button class="primary-btn">Cadastrar</button>
+    </form>
+
+    <a href="/" class="link-btn">Voltar</a>
+</section>
+</main>
+<script src="/static/js/install.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/service-worker.js');
+}
+</script>
+</body>
+</html>

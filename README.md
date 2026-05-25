@@ -1,43 +1,57 @@
+# Check do Golpe — Sistema Online Multiusuário
 
-# Check do Golpe — Simulador Educativo em Python
+Sistema educativo em Flask para simulação de golpes digitais, com:
+- Quiz mobile-first
+- Cadastro opcional
+- Login
+- Banco online PostgreSQL
+- Estatísticas centralizadas por faixa etária e assunto
+- Compatibilidade local com SQLite
+- PWA instalável
 
-Implementação em Python/Flask baseada nas Fases 1, 2 e 3 do projeto.
+## Rodar localmente
 
-## Funcionalidades implementadas
+```bash
+pip install -r requirements.txt
+python data/seed.py
+python data/questoes_seed.py
+python app.py
+```
 
-- Quiz mobile-first.
-- 10 questões com cenários seguros e fraudulentos.
-- Botões "É um Golpe!" e "É Seguro!".
-- Feedback imediato após cada resposta.
-- Pontuação e progresso.
-- Dicas opcionais.
-- Resultado final com acertos, erros e percentual.
-- Progresso local com localStorage.
-- Cadastro/login opcionais.
-- Histórico de tentativas para usuários autenticados.
-- Banco SQLite.
-- Estrutura PWA básica com manifest e service worker.
+Acesse:
 
-## Como executar
+```text
+http://127.0.0.1:5000
+```
 
-1. Instale as dependências:
+## Rodar online no Render
+
+1. Suba o projeto no GitHub.
+2. No Render, crie um PostgreSQL Database.
+3. Crie um Web Service apontando para o repositório.
+4. Build Command:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Execute:
+5. Start Command:
 
 ```bash
-python app.py
+gunicorn app:app
 ```
 
-3. Acesse no navegador:
+6. Variáveis de ambiente:
+   - `DATABASE_URL`: URL externa ou interna do PostgreSQL
+   - `SECRET_KEY`: uma chave secreta qualquer
+
+7. Depois de publicar, rode uma vez no Shell do Render:
 
 ```bash
-http://127.0.0.1:5000
+python data/seed.py
+python data/questoes_seed.py
 ```
 
 ## Observação
 
-Para ambiente de produção, troque a `secret_key` do Flask e use HTTPS.
+Com PostgreSQL online, todos os usuários acessam o mesmo sistema e as respostas ficam centralizadas no banco.
