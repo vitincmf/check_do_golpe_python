@@ -17,12 +17,32 @@ from estatisticas_service import (
     questoes_mais_erradas
 )
 
+
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "check-do-golpe-secret-dev")
 
+
+# Cria as tabelas automaticamente no Render/local
 create_database()
+
+
+# Insere dados iniciais automaticamente:
+# faixas etárias, grupos de perfil e assuntos
+try:
+    from data.seed import seed_database
+    seed_database()
+except Exception as e:
+    print("Seed inicial não executado:", e)
+
+
+# Insere questões automaticamente, se ainda não existirem
+try:
+    from data.questoes_seed import seed_questoes
+    seed_questoes()
+except Exception as e:
+    print("Seed de questões não executado:", e)
 
 
 @app.before_request
@@ -261,8 +281,10 @@ def responder():
     acertou = 1 if resposta_usuario == questao["resposta_correta"] else 0
 
     pontos = 0
+
     if acertou:
         pontos = questao["pontos"]
+
         if usou_dica:
             pontos = pontos // 2
 
@@ -384,8 +406,12 @@ def resultado():
     conn.close()
 
     percentual = 0
+
     if tentativa["total_questoes"] > 0:
-        percentual = round((tentativa["total_acertos"] / tentativa["total_questoes"]) * 100, 2)
+        percentual = round(
+            (tentativa["total_acertos"] / tentativa["total_questoes"]) * 100,
+            2
+        )
 
     return render_template(
         "resultado.html",

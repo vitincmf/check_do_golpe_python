@@ -24,7 +24,7 @@ def seed_database():
         (
             "Grupo 1",
             "Pouca experiência",
-            "Raramente compra online, usa pouco a internet, pode ter dificuldade com tecnologia, faixa etária mais ampla.",
+            "Raramente compra online, usa pouco a internet, pode ter dificuldade com tecnologia.",
             "Principal público-alvo do golpe. O quiz precisa funcionar especialmente bem para este grupo."
         ),
         (
@@ -55,14 +55,18 @@ def seed_database():
 
     for faixa in faixas:
         try:
-            cursor.execute(f"INSERT INTO faixas_etarias (nome) VALUES ({p})", (faixa,))
+            cursor.execute(
+                f"INSERT INTO faixas_etarias (nome) VALUES ({p})",
+                (faixa,)
+            )
             conn.commit()
         except Exception:
             conn.rollback()
 
     for grupo in grupos_perfil:
         try:
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 INSERT INTO grupos_perfil (
                     nome,
                     perfil,
@@ -70,20 +74,29 @@ def seed_database():
                     relevancia
                 )
                 VALUES ({p}, {p}, {p}, {p})
-            """, grupo)
+                """,
+                grupo
+            )
             conn.commit()
         except Exception:
             conn.rollback()
 
     for nome, descricao in assuntos:
         try:
-            cursor.execute(f"INSERT INTO assuntos (nome, descricao) VALUES ({p}, {p})", (nome, descricao))
+            cursor.execute(
+                f"INSERT INTO assuntos (nome, descricao) VALUES ({p}, {p})",
+                (nome, descricao)
+            )
             conn.commit()
         except Exception:
             conn.rollback()
 
     conn.close()
     print("Banco criado e dados iniciais inseridos com sucesso!")
+
+
+def inserir_dados():
+    seed_database()
 
 
 if __name__ == "__main__":
