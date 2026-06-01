@@ -2605,24 +2605,30 @@ def seed_questoes():
         inseridas += 1
 
 
-    conn.commit()
+conn.commit()
 
-    print("NOVAS QUESTÕES:", inseridas)
+    # =====================
+    # TESTE DO BANCO REAL
+    # =====================
 
     cursor.execute("SELECT COUNT(*) AS total FROM questoes")
-    total_questoes = fetchone(cursor)
+    linha = fetchone(cursor)
+    print(
+        "BANCO REAL - QUESTÕES:",
+        dict(linha) if not isinstance(linha, dict) else linha
+    )
 
     cursor.execute("SELECT COUNT(*) AS total FROM assuntos")
-    total_assuntos = fetchone(cursor)
+    linha = fetchone(cursor)
+    print(
+        "BANCO REAL - ASSUNTOS:",
+        dict(linha) if not isinstance(linha, dict) else linha
+    )
 
-    print("BANCO REAL - QUESTÕES:", total_questoes["total"])
-    print("BANCO REAL - ASSUNTOS:", total_assuntos["total"])
 
     conn.close()
 
-    print("Questões inseridas com sucesso!")
-
-
+    print("SEED FINALIZADO COM SUCESSO!")
 
 if __name__ == "__main__":
     seed_questoes()
