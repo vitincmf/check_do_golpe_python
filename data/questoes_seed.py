@@ -2524,35 +2524,58 @@ def misturar_dominios():
             q["url_simulada"] = substituicoes[q["url_simulada"]]
 
 def seed_questoes():
+
     create_database()
     misturar_dominios()
+
     conn = get_connection()
     cursor = conn.cursor()
     p = placeholder()
 
+
+    print("Iniciando seed de questões...")
+
+
+    inseridas = 0
+
+
     for q in QUESTOES:
+
         assunto_id = get_assunto_id(cursor, q["assunto"])
 
+
         if assunto_id is None:
+
             print(f"Assunto não encontrado: {q['assunto']}")
             continue
 
+
         cursor.execute(
-    f"""
-    SELECT id FROM questoes
-    WHERE titulo = {p}
-    AND descricao = {p}
-    AND url_simulada = {p}
-    """,
-    (q["titulo"], q["descricao"], q["url_simulada"])
-)
+            f"""
+            SELECT id FROM questoes
+            WHERE titulo = {p}
+            AND descricao = {p}
+            AND url_simulada = {p}
+            """,
+            (
+                q["titulo"],
+                q["descricao"],
+                q["url_simulada"]
+            )
+        )
+
+
         existente = fetchone(cursor)
+
 
         if existente:
             continue
 
-        cursor.execute(f"""
-            INSERT INTO questoes (
+
+        cursor.execute(
+            f"""
+            INSERT INTO questoes
+            (
                 titulo,
                 descricao,
                 url_simulada,
@@ -2562,24 +2585,44 @@ def seed_questoes():
                 pontos,
                 assunto_id
             )
-            VALUES ({p}, {p}, {p}, {p}, {p}, {p}, {p}, {p})
-        """, (
-            q["titulo"],
-            q["descricao"],
-            q["url_simulada"],
-            q["resposta_correta"],
-            q["explicacao"],
-            q["dica"],
-            q["pontos"],
-            assunto_id
-        ))
+            VALUES
+            ({p},{p},{p},{p},{p},{p},{p},{p})
+            """,
+            (
+                q["titulo"],
+                q["descricao"],
+                q["url_simulada"],
+                q["resposta_correta"],
+                q["explicacao"],
+                q["dica"],
+                q["pontos"],
+                assunto_id
+            )
+        )
+
+        inseridas += 1
+
 
     conn.commit()
+
+
+    print("NOVAS QUESTÕES:", inseridas)
+
+
+    cursor.execute("SELECT COUNT(*) FROM questoes")
+    print("BANCO REAL - QUESTÕES:", cursor.fetchone())
+
+
+    cursor.execute("SELECT COUNT(*) FROM assuntos")
+    print("BANCO REAL - ASSUNTOS:", cursor.fetchone())
+
+
     conn.close()
+
 
     print("Questões inseridas com sucesso!")
 
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     seed_questoes()
