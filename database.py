@@ -14,6 +14,8 @@ except ImportError:
 
 def get_database_url():
     return os.getenv("DATABASE_URL", "").strip()
+print("DATABASE_URL:", get_database_url()[:20])
+print("POSTGRES ATIVO:", get_database_url().startswith("postgres"))
 
 
 def is_postgres():
