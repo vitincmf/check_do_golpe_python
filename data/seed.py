@@ -7,11 +7,18 @@ from database import get_connection, create_database, placeholder
 
 
 def seed_database():
+
     create_database()
 
     conn = get_connection()
     cursor = conn.cursor()
     p = placeholder()
+
+    print("Iniciando seed...")
+
+    # =====================
+    # FAIXAS ETÁRIAS
+    # =====================
 
     faixas = [
         "Até 17 anos",
@@ -20,79 +27,137 @@ def seed_database():
         "50 anos ou mais"
     ]
 
+    for faixa in faixas:
+        cursor.execute(
+            f"""
+            INSERT INTO faixas_etarias (nome)
+            VALUES ({p})
+            ON CONFLICT (nome) DO NOTHING
+            """,
+            (faixa,)
+        )
+
+
+    # =====================
+    # GRUPOS
+    # =====================
+
     grupos_perfil = [
+
         (
             "Grupo 1",
             "Pouca experiência",
             "Raramente compra online, usa pouco a internet, pode ter dificuldade com tecnologia.",
-            "Principal público-alvo do golpe. O quiz precisa funcionar especialmente bem para este grupo."
+            "Principal público-alvo do golpe."
         ),
+
         (
             "Grupo 2",
             "Experiência moderada",
-            "Compra online às vezes, usa redes sociais e apps do dia a dia, mas não tem conhecimento técnico aprofundado.",
-            "Perfil intermediário, frequente entre estudantes universitários."
+            "Compra online às vezes, usa redes sociais e aplicativos.",
+            "Perfil intermediário."
         ),
+
         (
             "Grupo 3",
             "Experiência frequente",
-            "Compra online com regularidade, familiarizado com segurança digital, identifica facilmente sites suspeitos.",
-            "Serve como referência de desempenho esperado para quem já tem o letramento digital desenvolvido."
+            "Compra online regularmente e reconhece ameaças digitais.",
+            "Usuário mais preparado digitalmente."
         )
+
     ]
 
-    assuntos = [
-        ("Golpes bancários", "Fraudes envolvendo bancos, login falso e dados financeiros."),
-        ("Sites falsos / E-commerce fake", "Lojas falsas, promoções enganosas e páginas clonadas."),
-        ("Correios e entregas", "Golpes envolvendo rastreio, taxas falsas e encomendas."),
-        ("Phishing por e-mail", "Mensagens falsas tentando roubar dados do usuário."),
-        ("WhatsApp e redes sociais", "Golpes aplicados por mensagens e perfis falsos."),
-        ("Pix e pagamentos", "Fraudes envolvendo transferências, QR Codes e comprovantes."),
-        ("Falsos investimentos", "Promessas falsas de lucro rápido."),
-        ("Golpes com dados pessoais", "Tentativas de roubo de CPF, senhas e informações pessoais."),
-        ("IA, Deepfake e Engenharia Social", "Golpes modernos envolvendo inteligência artificial, clonagem de voz, deepfakes e engenharia social."),
-    ]
-
-    for faixa in faixas:
-        try:
-            cursor.execute(
-                f"INSERT INTO faixas_etarias (nome) VALUES ({p})",
-                (faixa,)
-            )
-            conn.commit()
-        except Exception:
-            conn.rollback()
 
     for grupo in grupos_perfil:
-        try:
-            cursor.execute(
-                f"""
-                INSERT INTO grupos_perfil (
-                    nome,
-                    perfil,
-                    caracteristicas,
-                    relevancia
-                )
-                VALUES ({p}, {p}, {p}, {p})
-                """,
-                grupo
+        cursor.execute(
+            f"""
+            INSERT INTO grupos_perfil
+            (
+                nome,
+                perfil,
+                caracteristicas,
+                relevancia
             )
-            conn.commit()
-        except Exception:
-            conn.rollback()
+            VALUES ({p},{p},{p},{p})
+            ON CONFLICT (nome) DO NOTHING
+            """,
+            grupo
+        )
 
-    for nome, descricao in assuntos:
-        try:
-            cursor.execute(
-                f"INSERT INTO assuntos (nome, descricao) VALUES ({p}, {p})",
-                (nome, descricao)
+
+    # =====================
+    # ASSUNTOS
+    # =====================
+
+    assuntos = [
+
+        (
+            "Golpes bancários",
+            "Fraudes envolvendo bancos e dados financeiros."
+        ),
+
+        (
+            "Sites falsos / E-commerce fake",
+            "Lojas falsas e páginas clonadas."
+        ),
+
+        (
+            "Correios e entregas",
+            "Golpes de rastreamento e taxas falsas."
+        ),
+
+        (
+            "Phishing por e-mail",
+            "Mensagens falsas roubando informações."
+        ),
+
+        (
+            "WhatsApp e redes sociais",
+            "Perfis falsos e mensagens fraudulentas."
+        ),
+
+        (
+            "Pix e pagamentos",
+            "Golpes envolvendo pagamentos digitais."
+        ),
+
+        (
+            "Falsos investimentos",
+            "Promessas falsas de lucro rápido."
+        ),
+
+        (
+            "Golpes com dados pessoais",
+            "Roubo de CPF e informações privadas."
+        ),
+
+        (
+            "IA, Deepfake e Engenharia Social",
+            "Golpes modernos usando inteligência artificial."
+        )
+
+    ]
+
+
+    for assunto in assuntos:
+        cursor.execute(
+            f"""
+            INSERT INTO assuntos
+            (
+                nome,
+                descricao
             )
-            conn.commit()
-        except Exception:
-            conn.rollback()
+            VALUES ({p},{p})
+            ON CONFLICT (nome) DO NOTHING
+            """,
+            assunto
+        )
 
+
+    conn.commit()
     conn.close()
-    print("Banco criado e dados iniciais inseridos com sucesso!")
+
+    print("SEED FINALIZADO COM SUCESSO!")
 
 
 def inserir_dados():
