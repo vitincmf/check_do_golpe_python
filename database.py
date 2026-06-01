@@ -1,9 +1,8 @@
 import os
 import sqlite3
-
+from urllib.parse import urlparse
 
 SQLITE_DATABASE = "check_do_golpe.db"
-
 
 try:
     import psycopg2
@@ -11,6 +10,25 @@ try:
 except ImportError:
     psycopg2 = None
 
+
+def get_database_url():
+    return os.getenv("DATABASE_URL", "").strip()
+
+
+def debug_database_url():
+    url = get_database_url()
+
+    print("DATABASE_URL:", url[:25])
+    print("POSTGRES ATIVO:", url.startswith("postgres"))
+
+    if url:
+        parsed = urlparse(url)
+        print("HOST DO BANCO:", parsed.hostname)
+        print("PORTA DO BANCO:", parsed.port)
+        print("DATABASE:", parsed.path)
+
+
+debug_database_url()
 
 def get_database_url():
     return os.getenv("DATABASE_URL", "").strip()
