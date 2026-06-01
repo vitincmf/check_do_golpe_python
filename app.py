@@ -22,6 +22,8 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "check-do-golpe-secret-dev")
 
+create_database()
+
 
 @app.before_request
 def garantir_visitante():
