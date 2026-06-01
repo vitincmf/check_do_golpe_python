@@ -10,6 +10,8 @@ from auth_service import criar_usuario, autenticar_usuario
 from estatisticas_service import (
     estatisticas_gerais,
     estatisticas_por_faixa_etaria,
+    estatisticas_por_grupo_perfil,
+    estatisticas_por_faixa_e_grupo,
     estatisticas_por_assunto,
     estatisticas_por_idade_e_assunto,
     questoes_mais_erradas
@@ -35,6 +37,9 @@ def index():
     cursor.execute("SELECT * FROM faixas_etarias ORDER BY id")
     faixas = fetchall(cursor)
 
+    cursor.execute("SELECT * FROM grupos_perfil ORDER BY id")
+    grupos = fetchall(cursor)
+
     cursor.execute("SELECT * FROM assuntos ORDER BY nome")
     assuntos = fetchall(cursor)
 
@@ -43,6 +48,7 @@ def index():
     return render_template(
         "index.html",
         faixas=faixas,
+        grupos=grupos,
         assuntos=assuntos,
         usuario=session.get("usuario_nome")
     )
@@ -52,8 +58,10 @@ def index():
 def cadastro():
     conn = get_connection()
     cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM faixas_etarias ORDER BY id")
     faixas = fetchall(cursor)
+
     conn.close()
 
     if request.method == "POST":
@@ -101,10 +109,15 @@ def logout():
 @app.route("/iniciar", methods=["POST"])
 def iniciar():
     faixa_etaria_id = request.form.get("faixa_etaria_id")
+    grupo_perfil_id = request.form.get("grupo_perfil_id")
     modo_quiz = request.form.get("modo_quiz")
 
     if not faixa_etaria_id:
         flash("Selecione uma faixa etária para iniciar.")
+        return redirect(url_for("index"))
+
+    if not grupo_perfil_id:
+        flash("Selecione seu perfil de experiência para iniciar.")
         return redirect(url_for("index"))
 
     if not modo_quiz:
@@ -132,22 +145,25 @@ def iniciar():
                 usuario_id,
                 visitante_id,
                 faixa_etaria_id,
+                grupo_perfil_id,
                 total_questoes,
                 pontuacao_total,
                 total_acertos,
                 total_erros,
                 finalizada
             )
-            VALUES ({p}, {p}, {p}, {p}, 0, 0, 0, 0)
+            VALUES ({p}, {p}, {p}, {p}, {p}, 0, 0, 0, 0)
             RETURNING id
         """, (
             session.get("usuario_id"),
             session.get("visitante_id"),
             faixa_etaria_id,
+            grupo_perfil_id,
             len(ids_questoes)
         ))
 
-        tentativa_id = cursor.fetchone()[0]
+        retorno = cursor.fetchone()
+        tentativa_id = retorno["id"] if isinstance(retorno, dict) else retorno[0]
 
     else:
         cursor.execute(f"""
@@ -155,17 +171,19 @@ def iniciar():
                 usuario_id,
                 visitante_id,
                 faixa_etaria_id,
+                grupo_perfil_id,
                 total_questoes,
                 pontuacao_total,
                 total_acertos,
                 total_erros,
                 finalizada
             )
-            VALUES ({p}, {p}, {p}, {p}, 0, 0, 0, 0)
+            VALUES ({p}, {p}, {p}, {p}, {p}, 0, 0, 0, 0)
         """, (
             session.get("usuario_id"),
             session.get("visitante_id"),
             faixa_etaria_id,
+            grupo_perfil_id,
             len(ids_questoes)
         ))
 
@@ -343,9 +361,12 @@ def resultado():
     cursor.execute(f"""
         SELECT 
             t.*,
-            f.nome AS faixa_etaria
+            f.nome AS faixa_etaria,
+            g.nome AS grupo_nome,
+            g.perfil AS grupo_perfil
         FROM tentativas t
         JOIN faixas_etarias f ON t.faixa_etaria_id = f.id
+        LEFT JOIN grupos_perfil g ON t.grupo_perfil_id = g.id
         WHERE t.id = {p}
     """, (tentativa_id,))
 
@@ -375,6 +396,8 @@ def resultado():
 def estatisticas():
     gerais = estatisticas_gerais()
     por_faixa = estatisticas_por_faixa_etaria()
+    por_grupo = estatisticas_por_grupo_perfil()
+    por_faixa_grupo = estatisticas_por_faixa_e_grupo()
     por_assunto = estatisticas_por_assunto()
     por_idade_assunto = estatisticas_por_idade_e_assunto()
     mais_erradas = questoes_mais_erradas()
@@ -383,6 +406,8 @@ def estatisticas():
         "estatisticas.html",
         gerais=gerais,
         por_faixa=por_faixa,
+        por_grupo=por_grupo,
+        por_faixa_grupo=por_faixa_grupo,
         por_assunto=por_assunto,
         por_idade_assunto=por_idade_assunto,
         mais_erradas=mais_erradas

@@ -12,10 +12,7 @@ except ImportError:
 
 
 def is_postgres():
-    return (
-        psycopg2 is not None
-        and DATABASE_URL.startswith("postgres")
-    )
+    return psycopg2 is not None and DATABASE_URL.startswith("postgres")
 
 
 def get_connection():
@@ -71,6 +68,16 @@ def create_database():
         """)
 
         cursor.execute("""
+            CREATE TABLE IF NOT EXISTS grupos_perfil (
+                id SERIAL PRIMARY KEY,
+                nome TEXT NOT NULL UNIQUE,
+                perfil TEXT NOT NULL,
+                caracteristicas TEXT NOT NULL,
+                relevancia TEXT NOT NULL
+            )
+        """)
+
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS assuntos (
                 id SERIAL PRIMARY KEY,
                 nome TEXT NOT NULL UNIQUE,
@@ -85,6 +92,7 @@ def create_database():
                 email TEXT UNIQUE,
                 senha TEXT,
                 faixa_etaria_id INTEGER REFERENCES faixas_etarias(id),
+                grupo_perfil_id INTEGER REFERENCES grupos_perfil(id),
                 criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
@@ -111,6 +119,7 @@ def create_database():
                 usuario_id INTEGER REFERENCES usuarios(id),
                 visitante_id TEXT,
                 faixa_etaria_id INTEGER NOT NULL REFERENCES faixas_etarias(id),
+                grupo_perfil_id INTEGER REFERENCES grupos_perfil(id),
                 pontuacao_total INTEGER DEFAULT 0,
                 total_questoes INTEGER DEFAULT 0,
                 total_acertos INTEGER DEFAULT 0,
@@ -133,11 +142,24 @@ def create_database():
             )
         """)
 
+        cursor.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS grupo_perfil_id INTEGER REFERENCES grupos_perfil(id)")
+        cursor.execute("ALTER TABLE tentativas ADD COLUMN IF NOT EXISTS grupo_perfil_id INTEGER REFERENCES grupos_perfil(id)")
+
     else:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS faixas_etarias (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nome TEXT NOT NULL UNIQUE
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS grupos_perfil (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome TEXT NOT NULL UNIQUE,
+                perfil TEXT NOT NULL,
+                caracteristicas TEXT NOT NULL,
+                relevancia TEXT NOT NULL
             )
         """)
 
@@ -156,8 +178,10 @@ def create_database():
                 email TEXT UNIQUE,
                 senha TEXT,
                 faixa_etaria_id INTEGER,
+                grupo_perfil_id INTEGER,
                 criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (faixa_etaria_id) REFERENCES faixas_etarias(id)
+                FOREIGN KEY (faixa_etaria_id) REFERENCES faixas_etarias(id),
+                FOREIGN KEY (grupo_perfil_id) REFERENCES grupos_perfil(id)
             )
         """)
 
@@ -184,6 +208,7 @@ def create_database():
                 usuario_id INTEGER,
                 visitante_id TEXT,
                 faixa_etaria_id INTEGER NOT NULL,
+                grupo_perfil_id INTEGER,
                 pontuacao_total INTEGER DEFAULT 0,
                 total_questoes INTEGER DEFAULT 0,
                 total_acertos INTEGER DEFAULT 0,
@@ -191,7 +216,8 @@ def create_database():
                 finalizada INTEGER DEFAULT 0,
                 criada_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-                FOREIGN KEY (faixa_etaria_id) REFERENCES faixas_etarias(id)
+                FOREIGN KEY (faixa_etaria_id) REFERENCES faixas_etarias(id),
+                FOREIGN KEY (grupo_perfil_id) REFERENCES grupos_perfil(id)
             )
         """)
 
@@ -209,6 +235,16 @@ def create_database():
                 FOREIGN KEY (questao_id) REFERENCES questoes(id)
             )
         """)
+
+        cursor.execute("PRAGMA table_info(usuarios)")
+        colunas_usuarios = [c[1] for c in cursor.fetchall()]
+        if "grupo_perfil_id" not in colunas_usuarios:
+            cursor.execute("ALTER TABLE usuarios ADD COLUMN grupo_perfil_id INTEGER")
+
+        cursor.execute("PRAGMA table_info(tentativas)")
+        colunas_tentativas = [c[1] for c in cursor.fetchall()]
+        if "grupo_perfil_id" not in colunas_tentativas:
+            cursor.execute("ALTER TABLE tentativas ADD COLUMN grupo_perfil_id INTEGER")
 
     conn.commit()
     conn.close()

@@ -48,6 +48,62 @@ def estatisticas_por_faixa_etaria():
     return dados
 
 
+def estatisticas_por_grupo_perfil():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            g.nome AS grupo,
+            g.perfil AS perfil,
+            COUNT(r.id) AS total_respostas,
+            COALESCE(SUM(r.acertou), 0) AS total_acertos,
+            COUNT(r.id) - COALESCE(SUM(r.acertou), 0) AS total_erros,
+            CASE 
+                WHEN COUNT(r.id) = 0 THEN 0
+                ELSE ROUND((COALESCE(SUM(r.acertou), 0) * 100.0) / COUNT(r.id), 2)
+            END AS percentual_acerto
+        FROM respostas r
+        JOIN tentativas t ON r.tentativa_id = t.id
+        JOIN grupos_perfil g ON t.grupo_perfil_id = g.id
+        GROUP BY g.id, g.nome, g.perfil
+        ORDER BY g.id
+    """)
+
+    dados = fetchall(cursor)
+    conn.close()
+    return dados
+
+
+def estatisticas_por_faixa_e_grupo():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            f.nome AS faixa_etaria,
+            g.nome AS grupo,
+            g.perfil AS perfil,
+            COUNT(r.id) AS total_respostas,
+            COALESCE(SUM(r.acertou), 0) AS total_acertos,
+            COUNT(r.id) - COALESCE(SUM(r.acertou), 0) AS total_erros,
+            CASE 
+                WHEN COUNT(r.id) = 0 THEN 0
+                ELSE ROUND((COALESCE(SUM(r.acertou), 0) * 100.0) / COUNT(r.id), 2)
+            END AS percentual_acerto
+        FROM respostas r
+        JOIN tentativas t ON r.tentativa_id = t.id
+        JOIN faixas_etarias f ON t.faixa_etaria_id = f.id
+        JOIN grupos_perfil g ON t.grupo_perfil_id = g.id
+        GROUP BY f.id, f.nome, g.id, g.nome, g.perfil
+        ORDER BY f.id, g.id
+    """)
+
+    dados = fetchall(cursor)
+    conn.close()
+    return dados
+
+
 def estatisticas_por_assunto():
     conn = get_connection()
     cursor = conn.cursor()

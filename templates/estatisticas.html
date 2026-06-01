@@ -1,104 +1,201 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#6c5ce7">
-<link rel="manifest" href="/static/manifest.json">
-<link rel="stylesheet" href="/static/css/style.css">
-<title>Estatísticas - Check do Golpe</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6c5ce7">
+
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <title>Estatísticas - Check do Golpe</title>
 </head>
+
 <body>
-<main class="app estatisticas-container">
-<section class="card estatisticas-card">
-    <h1>Estatísticas</h1>
-    <p class="subtitle">Dados centralizados de todos os usuários.</p>
+    <main class="app estatisticas-container">
+        <section class="card estatisticas-card">
 
-    <h2>Resumo Geral</h2>
-    <div class="resumo">
-        <div><strong>{{ gerais.total_respostas }}</strong><span>Respostas</span></div>
-        <div><strong>{{ gerais.total_acertos }}</strong><span>Acertos</span></div>
-        <div><strong>{{ gerais.total_erros }}</strong><span>Erros</span></div>
-    </div>
+            <h1>Estatísticas</h1>
+            <p class="subtitle">Dados centralizados de todos os usuários.</p>
 
-    <div class="resultado-box">
-        <h2>{{ gerais.percentual_acerto }}%</h2>
-        <p>Percentual geral de acerto</p>
-    </div>
+            <h2>Resumo Geral</h2>
 
-    <h2>Por Faixa Etária</h2>
-    <div class="tabela-scroll">
-        <table>
-            <tr><th>Faixa</th><th>Respostas</th><th>Acertos</th><th>Erros</th><th>%</th></tr>
-            {% for item in por_faixa %}
-            <tr>
-                <td>{{ item.faixa_etaria }}</td>
-                <td>{{ item.total_respostas }}</td>
-                <td>{{ item.total_acertos }}</td>
-                <td>{{ item.total_erros }}</td>
-                <td>{{ item.percentual_acerto }}%</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+            <div class="resumo">
+                <div><strong>{{ gerais.total_respostas }}</strong><span>Respostas</span></div>
+                <div><strong>{{ gerais.total_acertos }}</strong><span>Acertos</span></div>
+                <div><strong>{{ gerais.total_erros }}</strong><span>Erros</span></div>
+            </div>
 
-    <h2>Por Assunto</h2>
-    <div class="tabela-scroll">
-        <table>
-            <tr><th>Assunto</th><th>Respostas</th><th>Acertos</th><th>Erros</th><th>%</th></tr>
-            {% for item in por_assunto %}
-            <tr>
-                <td>{{ item.assunto }}</td>
-                <td>{{ item.total_respostas }}</td>
-                <td>{{ item.total_acertos }}</td>
-                <td>{{ item.total_erros }}</td>
-                <td>{{ item.percentual_acerto }}%</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+            <div class="resultado-box">
+                <h2>{{ gerais.percentual_acerto }}%</h2>
+                <p>Percentual geral de acerto</p>
+            </div>
 
-    <h2>Por Idade e Assunto</h2>
-    <div class="tabela-scroll">
-        <table>
-            <tr><th>Faixa</th><th>Assunto</th><th>Respostas</th><th>Acertos</th><th>Erros</th><th>%</th></tr>
-            {% for item in por_idade_assunto %}
-            <tr>
-                <td>{{ item.faixa_etaria }}</td>
-                <td>{{ item.assunto }}</td>
-                <td>{{ item.total_respostas }}</td>
-                <td>{{ item.total_acertos }}</td>
-                <td>{{ item.total_erros }}</td>
-                <td>{{ item.percentual_acerto }}%</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+            <h2>Por Faixa Etária</h2>
 
-    <h2>Questões Mais Erradas</h2>
-    <div class="tabela-scroll">
-        <table>
-            <tr><th>Questão</th><th>Assunto</th><th>Respostas</th><th>Erros</th><th>% erro</th></tr>
-            {% for item in mais_erradas %}
-            <tr>
-                <td>{{ item.titulo }}</td>
-                <td>{{ item.assunto }}</td>
-                <td>{{ item.total_respostas }}</td>
-                <td>{{ item.total_erros }}</td>
-                <td>{{ item.percentual_erro }}%</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+            <div class="tabela-scroll">
+                <table>
+                    <tr>
+                        <th>Faixa</th>
+                        <th>Respostas</th>
+                        <th>Acertos</th>
+                        <th>Erros</th>
+                        <th>%</th>
+                    </tr>
 
-    <a href="/" class="btn">Voltar</a>
-</section>
-</main>
-<script src="/static/js/install.js"></script>
-<script>
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/static/service-worker.js');
-}
-</script>
+                    {% for item in por_faixa %}
+                    <tr>
+                        <td>{{ item.faixa_etaria }}</td>
+                        <td>{{ item.total_respostas }}</td>
+                        <td>{{ item.total_acertos }}</td>
+                        <td>{{ item.total_erros }}</td>
+                        <td>{{ item.percentual_acerto }}%</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <h2>Por Perfil de Experiência</h2>
+
+            <div class="tabela-scroll">
+                <table>
+                    <tr>
+                        <th>Grupo</th>
+                        <th>Perfil</th>
+                        <th>Respostas</th>
+                        <th>Acertos</th>
+                        <th>Erros</th>
+                        <th>%</th>
+                    </tr>
+
+                    {% for item in por_grupo %}
+                    <tr>
+                        <td>{{ item.grupo }}</td>
+                        <td>{{ item.perfil }}</td>
+                        <td>{{ item.total_respostas }}</td>
+                        <td>{{ item.total_acertos }}</td>
+                        <td>{{ item.total_erros }}</td>
+                        <td>{{ item.percentual_acerto }}%</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <h2>Por Faixa Etária e Perfil</h2>
+
+            <div class="tabela-scroll">
+                <table>
+                    <tr>
+                        <th>Faixa</th>
+                        <th>Grupo</th>
+                        <th>Perfil</th>
+                        <th>Respostas</th>
+                        <th>Acertos</th>
+                        <th>Erros</th>
+                        <th>%</th>
+                    </tr>
+
+                    {% for item in por_faixa_grupo %}
+                    <tr>
+                        <td>{{ item.faixa_etaria }}</td>
+                        <td>{{ item.grupo }}</td>
+                        <td>{{ item.perfil }}</td>
+                        <td>{{ item.total_respostas }}</td>
+                        <td>{{ item.total_acertos }}</td>
+                        <td>{{ item.total_erros }}</td>
+                        <td>{{ item.percentual_acerto }}%</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <h2>Por Assunto</h2>
+
+            <div class="tabela-scroll">
+                <table>
+                    <tr>
+                        <th>Assunto</th>
+                        <th>Respostas</th>
+                        <th>Acertos</th>
+                        <th>Erros</th>
+                        <th>%</th>
+                    </tr>
+
+                    {% for item in por_assunto %}
+                    <tr>
+                        <td>{{ item.assunto }}</td>
+                        <td>{{ item.total_respostas }}</td>
+                        <td>{{ item.total_acertos }}</td>
+                        <td>{{ item.total_erros }}</td>
+                        <td>{{ item.percentual_acerto }}%</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <h2>Por Idade e Assunto</h2>
+
+            <div class="tabela-scroll">
+                <table>
+                    <tr>
+                        <th>Faixa</th>
+                        <th>Assunto</th>
+                        <th>Respostas</th>
+                        <th>Acertos</th>
+                        <th>Erros</th>
+                        <th>%</th>
+                    </tr>
+
+                    {% for item in por_idade_assunto %}
+                    <tr>
+                        <td>{{ item.faixa_etaria }}</td>
+                        <td>{{ item.assunto }}</td>
+                        <td>{{ item.total_respostas }}</td>
+                        <td>{{ item.total_acertos }}</td>
+                        <td>{{ item.total_erros }}</td>
+                        <td>{{ item.percentual_acerto }}%</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <h2>Questões Mais Erradas</h2>
+
+            <div class="tabela-scroll">
+                <table>
+                    <tr>
+                        <th>Questão</th>
+                        <th>Assunto</th>
+                        <th>Respostas</th>
+                        <th>Erros</th>
+                        <th>% erro</th>
+                    </tr>
+
+                    {% for item in mais_erradas %}
+                    <tr>
+                        <td>{{ item.titulo }}</td>
+                        <td>{{ item.assunto }}</td>
+                        <td>{{ item.total_respostas }}</td>
+                        <td>{{ item.total_erros }}</td>
+                        <td>{{ item.percentual_erro }}%</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <a href="/" class="btn">Voltar</a>
+
+        </section>
+    </main>
+
+    <script src="/static/js/install.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/service-worker.js');
+        }
+    </script>
 </body>
+
 </html>

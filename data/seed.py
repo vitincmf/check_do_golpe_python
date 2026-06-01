@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from database import get_connection, create_database, placeholder
@@ -19,6 +20,27 @@ def seed_database():
         "50 anos ou mais"
     ]
 
+    grupos_perfil = [
+        (
+            "Grupo 1",
+            "Pouca experiência",
+            "Raramente compra online, usa pouco a internet, pode ter dificuldade com tecnologia, faixa etária mais ampla.",
+            "Principal público-alvo do golpe. O quiz precisa funcionar especialmente bem para este grupo."
+        ),
+        (
+            "Grupo 2",
+            "Experiência moderada",
+            "Compra online às vezes, usa redes sociais e apps do dia a dia, mas não tem conhecimento técnico aprofundado.",
+            "Perfil intermediário, frequente entre estudantes universitários."
+        ),
+        (
+            "Grupo 3",
+            "Experiência frequente",
+            "Compra online com regularidade, familiarizado com segurança digital, identifica facilmente sites suspeitos.",
+            "Serve como referência de desempenho esperado para quem já tem o letramento digital desenvolvido."
+        )
+    ]
+
     assuntos = [
         ("Golpes bancários", "Fraudes envolvendo bancos, login falso e dados financeiros."),
         ("Sites falsos / E-commerce fake", "Lojas falsas, promoções enganosas e páginas clonadas."),
@@ -34,16 +56,32 @@ def seed_database():
     for faixa in faixas:
         try:
             cursor.execute(f"INSERT INTO faixas_etarias (nome) VALUES ({p})", (faixa,))
+            conn.commit()
+        except Exception:
+            conn.rollback()
+
+    for grupo in grupos_perfil:
+        try:
+            cursor.execute(f"""
+                INSERT INTO grupos_perfil (
+                    nome,
+                    perfil,
+                    caracteristicas,
+                    relevancia
+                )
+                VALUES ({p}, {p}, {p}, {p})
+            """, grupo)
+            conn.commit()
         except Exception:
             conn.rollback()
 
     for nome, descricao in assuntos:
         try:
             cursor.execute(f"INSERT INTO assuntos (nome, descricao) VALUES ({p}, {p})", (nome, descricao))
+            conn.commit()
         except Exception:
             conn.rollback()
 
-    conn.commit()
     conn.close()
     print("Banco criado e dados iniciais inseridos com sucesso!")
 
