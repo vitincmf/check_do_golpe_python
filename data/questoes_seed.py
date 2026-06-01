@@ -1,10 +1,12 @@
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+ROOT_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT_DIR))
 
 from database import get_connection, create_database, placeholder, fetchone
 
+print("USANDO DATABASE.PY:", ROOT_DIR / "database.py")
 
 QUESTOES = [
     # GOLPES BANCÁRIOS
@@ -2605,20 +2607,18 @@ def seed_questoes():
 
     conn.commit()
 
-
     print("NOVAS QUESTÕES:", inseridas)
 
+    cursor.execute("SELECT COUNT(*) AS total FROM questoes")
+    total_questoes = fetchone(cursor)
 
-    cursor.execute("SELECT COUNT(*) FROM questoes")
-    print("BANCO REAL - QUESTÕES:", cursor.fetchone())
+    cursor.execute("SELECT COUNT(*) AS total FROM assuntos")
+    total_assuntos = fetchone(cursor)
 
-
-    cursor.execute("SELECT COUNT(*) FROM assuntos")
-    print("BANCO REAL - ASSUNTOS:", cursor.fetchone())
-
+    print("BANCO REAL - QUESTÕES:", total_questoes["total"])
+    print("BANCO REAL - ASSUNTOS:", total_assuntos["total"])
 
     conn.close()
-
 
     print("Questões inseridas com sucesso!")
 

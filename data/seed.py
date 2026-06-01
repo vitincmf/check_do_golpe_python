@@ -1,10 +1,12 @@
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+ROOT_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT_DIR))
 
-from database import get_connection, create_database, placeholder
+from database import get_connection, create_database, placeholder, fetchone
 
+print("USANDO DATABASE.PY:", ROOT_DIR / "database.py")
 
 def seed_database():
 
