@@ -49,3 +49,7 @@ print("---------------------")
 
 cursor.close()
 conn.close()
+
+
+def seed_database():
+    pass
