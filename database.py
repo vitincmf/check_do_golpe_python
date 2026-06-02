@@ -52,19 +52,12 @@ def get_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-    conn = sqlite3.connect(SQLITE_DATABASE)
-    conn.row_factory = sqlite3.Row
-
-    return conn
-
 
 def placeholder():
-
     return "%s" if is_postgres() else "?"
 
 
 def fetchone(cursor):
-
     row = cursor.fetchone()
 
     if row is None:
@@ -77,7 +70,6 @@ def fetchone(cursor):
 
 
 def fetchall(cursor):
-
     rows = cursor.fetchall()
 
     if is_postgres():
@@ -87,14 +79,12 @@ def fetchall(cursor):
 
 
 def create_database():
-
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT current_database() AS db, current_schema() AS schema")
-    print("DB/SCHEMA USADO:", fetchone(cursor))
-
     if is_postgres():
+        cursor.execute("SELECT current_database() AS db, current_schema() AS schema")
+        print("DB/SCHEMA USADO:", fetchone(cursor))
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS faixas_etarias (
@@ -102,7 +92,6 @@ def create_database():
                 nome TEXT NOT NULL UNIQUE
             )
         """)
-
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS grupos_perfil (
@@ -114,7 +103,6 @@ def create_database():
             )
         """)
 
-
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS assuntos (
                 id SERIAL PRIMARY KEY,
@@ -122,7 +110,6 @@ def create_database():
                 descricao TEXT
             )
         """)
-
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS usuarios (
@@ -135,7 +122,6 @@ def create_database():
                 criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS questoes (
@@ -153,7 +139,6 @@ def create_database():
             )
         """)
 
-
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS tentativas (
                 id SERIAL PRIMARY KEY,
@@ -170,7 +155,6 @@ def create_database():
             )
         """)
 
-
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS respostas (
                 id SERIAL PRIMARY KEY,
@@ -184,28 +168,23 @@ def create_database():
             )
         """)
 
-
         cursor.execute("""
             ALTER TABLE usuarios
             ADD COLUMN IF NOT EXISTS grupo_perfil_id INTEGER
         """)
-
 
         cursor.execute("""
             ALTER TABLE tentativas
             ADD COLUMN IF NOT EXISTS grupo_perfil_id INTEGER
         """)
 
-
     else:
-
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS faixas_etarias (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nome TEXT UNIQUE
             )
         """)
-
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS grupos_perfil (
@@ -217,7 +196,6 @@ def create_database():
             )
         """)
 
-
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS assuntos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -225,7 +203,6 @@ def create_database():
                 descricao TEXT
             )
         """)
-
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS usuarios (
@@ -238,7 +215,6 @@ def create_database():
                 criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS questoes (
@@ -256,7 +232,6 @@ def create_database():
             )
         """)
 
-
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS tentativas (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -273,7 +248,6 @@ def create_database():
             )
         """)
 
-
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS respostas (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -286,7 +260,6 @@ def create_database():
                 respondida_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-
 
     conn.commit()
     conn.close()
