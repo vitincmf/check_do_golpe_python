@@ -93,6 +93,69 @@ def ensure_sqlite_column(cursor, table_name, column_name, column_definition):
         cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_definition}")
 
 
+def ensure_sqlite_schema(cursor):
+    schema = {
+        "faixas_etarias": {
+            "nome": "TEXT",
+        },
+        "grupos_perfil": {
+            "nome": "TEXT",
+            "perfil": "TEXT",
+            "caracteristicas": "TEXT",
+            "relevancia": "TEXT",
+        },
+        "assuntos": {
+            "nome": "TEXT",
+            "descricao": "TEXT",
+        },
+        "usuarios": {
+            "nome": "TEXT",
+            "email": "TEXT",
+            "senha": "TEXT",
+            "faixa_etaria_id": "INTEGER",
+            "grupo_perfil_id": "INTEGER",
+            "criado_em": "TIMESTAMP",
+        },
+        "questoes": {
+            "titulo": "TEXT",
+            "descricao": "TEXT",
+            "url_simulada": "TEXT",
+            "imagem": "TEXT",
+            "resposta_correta": "TEXT",
+            "explicacao": "TEXT",
+            "dica": "TEXT",
+            "pontos": "INTEGER DEFAULT 10",
+            "assunto_id": "INTEGER",
+            "ativo": "INTEGER DEFAULT 1",
+        },
+        "tentativas": {
+            "usuario_id": "INTEGER",
+            "visitante_id": "TEXT",
+            "faixa_etaria_id": "INTEGER",
+            "grupo_perfil_id": "INTEGER",
+            "pontuacao_total": "INTEGER DEFAULT 0",
+            "total_questoes": "INTEGER DEFAULT 0",
+            "total_acertos": "INTEGER DEFAULT 0",
+            "total_erros": "INTEGER DEFAULT 0",
+            "finalizada": "INTEGER DEFAULT 0",
+            "criada_em": "TIMESTAMP",
+        },
+        "respostas": {
+            "tentativa_id": "INTEGER",
+            "questao_id": "INTEGER",
+            "resposta_usuario": "TEXT",
+            "acertou": "INTEGER",
+            "usou_dica": "INTEGER DEFAULT 0",
+            "pontos_obtidos": "INTEGER DEFAULT 0",
+            "respondida_em": "TIMESTAMP",
+        },
+    }
+
+    for table_name, columns in schema.items():
+        for column_name, column_definition in columns.items():
+            ensure_sqlite_column(cursor, table_name, column_name, column_definition)
+
+
 def create_database():
     conn = get_connection()
     cursor = conn.cursor()
@@ -276,8 +339,7 @@ def create_database():
             )
         """)
 
-        ensure_sqlite_column(cursor, "usuarios", "grupo_perfil_id", "INTEGER")
-        ensure_sqlite_column(cursor, "tentativas", "grupo_perfil_id", "INTEGER")
+        ensure_sqlite_schema(cursor)
 
     conn.commit()
     conn.close()
