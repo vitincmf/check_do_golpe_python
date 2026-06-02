@@ -2603,7 +2603,7 @@ def seed_questoes():
         )
 
         inseridas += 1
-conn.commit()
+    conn.commit()
 
     cursor.execute("SELECT COUNT(*) AS total FROM questoes")
     linha = fetchone(cursor)
