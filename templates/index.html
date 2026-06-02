@@ -1,319 +1,136 @@
 <!DOCTYPE html>
-
 <html lang="pt-br">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta name="theme-color" content="#6c5ce7">
-
-
-    <title>Check do Golpe</title>
-
-
-    <link rel="manifest" href="/static/manifest.json">
-
-    <link rel="stylesheet" href="/static/css/style.css">
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101727">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+<title>Check do Golpe</title>
 </head>
-
-
 <body>
-
-    <main class="app">
-
-        <section class="hero-card">
-
-
-            <div class="logo-circle">
-
-                🛡️
-
-            </div>
-
-
-            <h1>Check do Golpe</h1>
-
-
-            <p class="subtitle">
-
-                Aprenda a identificar golpes digitais de forma interativa.
-
-            </p>
-
-
-
-            {% with messages = get_flashed_messages() %}
-
-                {% if messages %}
-
-                    <div class="flash">
-
-                        {{ messages[0] }}
-
-                    </div>
-
-                {% endif %}
-
-            {% endwith %}
-
-
-
-            {% if usuario %}
-
-
-                <p class="user-pill">
-
-                    Logado como {{ usuario }}
-
-                </p>
-
-
-                <a href="/logout" class="link-btn">
-
-                    Sair
-
-                </a>
-
-
-            {% else %}
-
-
-                <div class="auth-links">
-
-                    <a href="/login">
-
-                        Entrar
-
-                    </a>
-
-
-                    <a href="/cadastro">
-
-                        Criar conta opcional
-
-                    </a>
-
+<main class="app home-app">
+    <section class="app-shell home-screen">
+        <div class="intro-screen">
+            <header class="onboarding-hero">
+                <div class="onboarding-copy">
+                    <span class="eyebrow">Quiz de investigação digital</span>
+                    <h1>Você consegue farejar um golpe?</h1>
+                    <p>Leia o caso, escolha sua resposta e descubra na hora quais sinais entregam uma fraude.</p>
                 </div>
 
+                <div class="mission-card" aria-hidden="true">
+                    <div class="mission-top">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <strong>Caso #01</strong>
+                    </div>
+                    <div class="mission-body">
+                        <div class="scan-ring">
+                            <span>?</span>
+                        </div>
+                        <div class="signal-list">
+                            <i></i>
+                            <i></i>
+                            <i></i>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="onboarding-actions">
+                    <a href="#configurar-rodada" class="primary-btn start-onboarding">Começar</a>
+                    <p>Sem instalação. Sem login obrigatório.</p>
+                </div>
+            </header>
+
+            <section class="onboarding-steps" aria-label="Como funciona">
+                <article>
+                    <strong>1</strong>
+                    <span>Leia o cenário</span>
+                </article>
+                <article>
+                    <strong>2</strong>
+                    <span>Escolha golpe ou seguro</span>
+                </article>
+                <article>
+                    <strong>3</strong>
+                    <span>Veja o relatório</span>
+                </article>
+            </section>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash">{{ messages[0] }}</div>
             {% endif %}
+        {% endwith %}
 
+        <section class="home-panel setup-screen" id="configurar-rodada">
+            <a href="#" class="back-to-intro">← Voltar</a>
 
+            <div class="panel-copy">
+                <h2>Monte sua rodada</h2>
+                <p>Escolha o perfil para adaptar a experiência. Depois é só jogar.</p>
+            </div>
 
-
-            <form action="/iniciar" method="POST">
-
-
-
-                <!-- FAIXA ETÁRIA -->
-
-                <label for="faixa_etaria_id">
-
-                    Faixa etária
-
-                </label>
-
-
-
-                <select 
-                    name="faixa_etaria_id"
-                    id="faixa_etaria_id"
-                    required>
-
-
-                    <option value="">
-
-                        Selecione sua faixa etária
-
-                    </option>
-
-
-
+            <form action="/iniciar" method="POST" class="quiz-form">
+                <label for="faixa_etaria_id">Faixa etária</label>
+                <select name="faixa_etaria_id" id="faixa_etaria_id" required>
+                    <option value="">Selecione sua faixa etária</option>
                     {% for faixa in faixas %}
-
-
-                        <option value="{{ faixa.id }}">
-
-                            {{ faixa.nome }}
-
-                        </option>
-
-
+                        <option value="{{ faixa.id }}">{{ faixa.nome }}</option>
                     {% endfor %}
-
-
                 </select>
 
-
-
-
-
-                <!-- PERFIL DE EXPERIÊNCIA -->
-
-                <label for="grupo_perfil_id">
-
-                    Perfil de experiência
-
-                </label>
-
-
-
-                <select 
-                    name="grupo_perfil_id"
-                    id="grupo_perfil_id"
-                    required>
-
-
-
-                    <option value="">
-
-                        Selecione seu perfil
-
-                    </option>
-
-
-
+                <label for="grupo_perfil_id">Perfil de experiência</label>
+                <select name="grupo_perfil_id" id="grupo_perfil_id" required>
+                    <option value="">Selecione seu perfil</option>
                     {% for grupo in grupos %}
-
-
-                      <option value="{{ grupo.id }}">
-    {{ grupo.nome }} - {{ grupo.perfil }} | {{ grupo.caracteristicas }}
-</option>
-
-
+                        <option value="{{ grupo.id }}">{{ grupo.nome }} - {{ grupo.perfil }} | {{ grupo.caracteristicas }}</option>
                     {% endfor %}
-
-
-
                 </select>
 
-
-
-
-
-                <!-- TIPO DE QUIZ -->
-
-
-                <label for="modo_quiz">
-
-                    Tipo de quiz
-
-                </label>
-
-
-
-                <select 
-                    name="modo_quiz"
-                    id="modo_quiz"
-                    required>
-
-
-
-                    <option value="misturado">
-
-                        Todos os assuntos
-
-                    </option>
-
-
-
-
+                <label for="modo_quiz">Tipo de quiz</label>
+                <select name="modo_quiz" id="modo_quiz" required>
+                    <option value="misturado">Todos os assuntos</option>
                     {% for assunto in assuntos %}
-
-
-
-                        <option value="{{ assunto.id }}">
-
-
-                            {{ assunto.nome }}
-
-
-                        </option>
-
-
-
+                        <option value="{{ assunto.id }}">{{ assunto.nome }}</option>
                     {% endfor %}
-
-
-
                 </select>
 
-
-
-
-
-                <button 
-                    type="submit"
-                    class="primary-btn">
-
-
-                    Iniciar Quiz
-
-
-                </button>
-
-
-
+                <button type="submit" class="primary-btn">Iniciar quiz</button>
             </form>
 
+            <p class="visitor-note">Você pode continuar como visitante. Conta e instalação são opcionais.</p>
 
+            {% if usuario %}
+                <div class="account-strip">
+                    <span>Logado como <strong>{{ usuario }}</strong></span>
+                    <a href="/logout">Sair</a>
+                </div>
+            {% else %}
+                <div class="optional-account">
+                    <span>Conta é opcional.</span>
+                    <a href="/login">Entrar</a>
+                    <a href="/cadastro">Criar conta</a>
+                </div>
+            {% endif %}
 
-
-
-            <button 
-                id="installBtn"
-                class="secondary-btn"
-                style="display:none;">
-
-
-                Instalar Aplicativo
-
-
-            </button>
-
-
-
-
-            <a href="/estatisticas" class="link-btn">
-
-                Ver Estatísticas
-
-            </a>
-
-
-
+            <button id="installBtn" class="secondary-btn install-optional" style="display:none;">Instalar app depois</button>
+            <a href="/estatisticas" class="text-link">Ver estatísticas</a>
         </section>
+    </section>
+</main>
 
-    </main>
-
-
-
-
-
-    <script src="/static/js/install.js"></script>
-
-
-
-    <script>
-
-
-        if ('serviceWorker' in navigator) {
-
-
-            navigator.serviceWorker.register('/static/service-worker.js');
-
-
-        }
-
-
-    </script>
-
-
-
+<script src="/static/js/install.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/service-worker.js');
+}
+</script>
 </body>
-
 </html>

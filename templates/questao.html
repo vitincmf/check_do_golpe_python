@@ -3,50 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#6c5ce7">
+<meta name="theme-color" content="#101727">
 <link rel="manifest" href="/static/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/style.css">
 <title>Questão - Check do Golpe</title>
 </head>
 <body>
-<main class="app">
-<section class="card">
-    <div class="topo">
-        <span>Questão {{ numero }}/{{ total }}</span>
-        <span>{{ questao.pontos }} pts</span>
-    </div>
+<main class="app quiz-app">
+    <section class="app-shell quiz-screen">
+        <header class="case-header">
+            <div class="status-row">
+                <a href="/reiniciar" class="back-link">← Voltar</a>
+                <span class="xp-pill">{{ questao.pontos }} pts</span>
+            </div>
 
-    <div class="barra">
-        <div class="progresso" style="width: {{ (numero / total) * 100 }}%;"></div>
-    </div>
+            <div class="case-kicker">Caso {{ numero }} de {{ total }}</div>
+            <div class="progress-track" aria-label="Progresso do quiz">
+                <div class="progress-fill" style="width: {{ (numero / total) * 100 }}%;"></div>
+            </div>
+        </header>
 
-    <small class="assunto">{{ questao.assunto }}</small>
+        <section class="case-card">
+            <div class="case-tabs">
+                <span></span>
+                <span></span>
+                <span></span>
+                <strong>Análise do cenário</strong>
+            </div>
 
-    <div class="site-fake">
-        <div class="browser-bar">{{ questao.url_simulada }}</div>
-        <h2>{{ questao.titulo }}</h2>
-        <p>{{ questao.descricao }}</p>
-    </div>
+            <div class="address-bar">
+                <span>{{ "Seguro?" if questao.url_simulada.startswith("https") or questao.url_simulada.startswith("app") else "Alerta" }}</span>
+                <strong>{{ questao.url_simulada }}</strong>
+            </div>
 
-    <h3>Este site é legítimo ou uma armadilha?</h3>
+            <div class="case-body">
+                <small>{{ questao.assunto }}</small>
+                <h2>{{ questao.titulo }}</h2>
+                <p>{{ questao.descricao }}</p>
+            </div>
+        </section>
 
-    <form action="/responder" method="POST">
-        <input type="hidden" name="questao_id" value="{{ questao.id }}">
-        <input type="hidden" name="usou_dica" id="usou_dica" value="0">
+        <section class="question-block">
+            <span class="eyebrow dark">Sua decisão</span>
+            <h1>Esse cenário parece confiável ou é um golpe?</h1>
+        </section>
 
-        <button type="submit" name="resposta_usuario" value="golpe" class="opcao golpe">É um Golpe!</button>
-        <button type="submit" name="resposta_usuario" value="seguro" class="opcao seguro">É Seguro!</button>
-    </form>
+        <form action="/responder" method="POST" class="answer-form">
+            <input type="hidden" name="questao_id" value="{{ questao.id }}">
+            <input type="hidden" name="usou_dica" id="usou_dica" value="0">
 
-    <button class="dica-btn" onclick="mostrarDica()">Usar dica</button>
-    <div id="dica" class="dica escondido">{{ questao.dica }}</div>
-</section>
+            <button type="submit" name="resposta_usuario" value="golpe" class="answer-card answer-danger">
+                <span class="answer-mark">!</span>
+                <span>
+                    <strong>É um golpe</strong>
+                    <small>Tem sinais falsos, urgentes ou suspeitos.</small>
+                </span>
+                <b>→</b>
+            </button>
+
+            <button type="submit" name="resposta_usuario" value="seguro" class="answer-card answer-safe">
+                <span class="answer-mark">✓</span>
+                <span>
+                    <strong>Parece seguro</strong>
+                    <small>O cenário tem sinais de legitimidade.</small>
+                </span>
+                <b>→</b>
+            </button>
+        </form>
+
+        <button class="hint-card" type="button" onclick="mostrarDica()">
+            <span class="hint-dot">?</span>
+            <span>
+                <strong>Dica disponível</strong>
+                <small id="hintText">Revele uma pista antes de decidir.</small>
+            </span>
+            <b>Usar</b>
+        </button>
+
+        <div id="dica" class="dica escondido">{{ questao.dica }}</div>
+    </section>
 </main>
 
 <script>
 function mostrarDica() {
     document.getElementById("dica").classList.remove("escondido");
     document.getElementById("usou_dica").value = "1";
+    document.getElementById("hintText").textContent = "Dica usada nesta questão.";
 }
 </script>
 <script src="/static/js/install.js"></script>

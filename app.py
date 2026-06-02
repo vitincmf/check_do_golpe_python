@@ -365,9 +365,20 @@ def feedback():
     )
 
     questao = fetchone(cursor)
+
+    tentativa_id = session.get("tentativa_id")
+    cursor.execute(f"SELECT pontuacao_total, total_questoes FROM tentativas WHERE id = {p}", (tentativa_id,))
+    tentativa = fetchone(cursor)
     conn.close()
 
-    return render_template("feedback.html", questao=questao, dados=dados)
+    return render_template(
+        "feedback.html",
+        questao=questao,
+        dados=dados,
+        numero=session.get("indice_atual", 0) + 1,
+        total=tentativa["total_questoes"] if tentativa else len(session.get("questoes", [])),
+        pontuacao_atual=tentativa["pontuacao_total"] if tentativa else 0
+    )
 
 
 @app.route("/proxima")
