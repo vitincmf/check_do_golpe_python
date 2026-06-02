@@ -36,20 +36,27 @@ def is_postgres():
 
 
 def get_connection():
+
     if is_postgres():
+
         conn = psycopg2.connect(
             get_database_url(),
             cursor_factory=psycopg2.extras.RealDictCursor
         )
 
         cursor = conn.cursor()
-        cursor.execute("SET search_path TO public")
+
+        cursor.execute("SET search_path TO public, auth, extensions")
+
         cursor.close()
 
         return conn
 
+
     conn = sqlite3.connect(SQLITE_DATABASE)
+
     conn.row_factory = sqlite3.Row
+
     return conn
 
 
