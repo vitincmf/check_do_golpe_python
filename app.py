@@ -14,9 +14,8 @@ from estatisticas_service import (
     estatisticas_por_faixa_e_grupo,
     estatisticas_por_assunto,
     estatisticas_por_idade_e_assunto,
-    questoes_mais_erradas
+    questoes_mais_erradas,
 )
-
 
 load_dotenv()
 
@@ -24,25 +23,17 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "check-do-golpe-secret-dev")
 
 
-# Cria as tabelas automaticamente no Render/local
+# =====================
+# INICIALIZAÇÃO DO BANCO
+# =====================
+
 create_database()
 
+from data.seed import seed_database
+seed_database()
 
-# Insere dados iniciais automaticamente:
-# faixas etárias, grupos de perfil e assuntos
-try:
-    from data.seed import seed_database
-    seed_database()
-except Exception as e:
-    print("Seed inicial não executado:", e)
-
-
-# Insere questões automaticamente, se ainda não existirem
-try:
-    from data.questoes_seed import seed_questoes
-    seed_questoes()
-except Exception as e:
-    print("Seed de questões não executado:", e)
+from data.questoes_seed import seed_questoes
+seed_questoes()
 
 
 @app.before_request
@@ -72,7 +63,7 @@ def index():
         faixas=faixas,
         grupos=grupos,
         assuntos=assuntos,
-        usuario=session.get("usuario_nome")
+        usuario=session.get("usuario_nome"),
     )
 
 
@@ -162,7 +153,8 @@ def iniciar():
     p = placeholder()
 
     if p == "%s":
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             INSERT INTO tentativas (
                 usuario_id,
                 visitante_id,
@@ -176,19 +168,22 @@ def iniciar():
             )
             VALUES ({p}, {p}, {p}, {p}, {p}, 0, 0, 0, 0)
             RETURNING id
-        """, (
-            session.get("usuario_id"),
-            session.get("visitante_id"),
-            faixa_etaria_id,
-            grupo_perfil_id,
-            len(ids_questoes)
-        ))
+            """,
+            (
+                session.get("usuario_id"),
+                session.get("visitante_id"),
+                faixa_etaria_id,
+                grupo_perfil_id,
+                len(ids_questoes),
+            ),
+        )
 
         retorno = cursor.fetchone()
         tentativa_id = retorno["id"] if isinstance(retorno, dict) else retorno[0]
 
     else:
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             INSERT INTO tentativas (
                 usuario_id,
                 visitante_id,
@@ -201,13 +196,15 @@ def iniciar():
                 finalizada
             )
             VALUES ({p}, {p}, {p}, {p}, {p}, 0, 0, 0, 0)
-        """, (
-            session.get("usuario_id"),
-            session.get("visitante_id"),
-            faixa_etaria_id,
-            grupo_perfil_id,
-            len(ids_questoes)
-        ))
+            """,
+            (
+                session.get("usuario_id"),
+                session.get("visitante_id"),
+                faixa_etaria_id,
+                grupo_perfil_id,
+                len(ids_questoes),
+            ),
+        )
 
         tentativa_id = cursor.lastrowid
 
@@ -240,14 +237,17 @@ def questao():
     cursor = conn.cursor()
     p = placeholder()
 
-    cursor.execute(f"""
+    cursor.execute(
+        f"""
         SELECT 
             q.*,
             a.nome AS assunto
         FROM questoes q
         JOIN assuntos a ON q.assunto_id = a.id
         WHERE q.id = {p}
-    """, (questao_id,))
+        """,
+        (questao_id,),
+    )
 
     questao = fetchone(cursor)
     conn.close()
@@ -257,7 +257,7 @@ def questao():
         questao=questao,
         numero=indice + 1,
         total=len(questoes),
-        usuario=session.get("usuario_nome")
+        usuario=session.get("usuario_nome"),
     )
 
 
@@ -288,7 +288,8 @@ def responder():
         if usou_dica:
             pontos = pontos // 2
 
-    cursor.execute(f"""
+    cursor.execute(
+        f"""
         INSERT INTO respostas (
             tentativa_id,
             questao_id,
@@ -298,28 +299,33 @@ def responder():
             pontos_obtidos
         )
         VALUES ({p}, {p}, {p}, {p}, {p}, {p})
-    """, (
-        tentativa_id,
-        questao_id,
-        resposta_usuario,
-        acertou,
-        usou_dica,
-        pontos
-    ))
+        """,
+        (
+            tentativa_id,
+            questao_id,
+            resposta_usuario,
+            acertou,
+            usou_dica,
+            pontos,
+        ),
+    )
 
-    cursor.execute(f"""
+    cursor.execute(
+        f"""
         UPDATE tentativas
         SET 
             pontuacao_total = pontuacao_total + {p},
             total_acertos = total_acertos + {p},
             total_erros = total_erros + {p}
         WHERE id = {p}
-    """, (
-        pontos,
-        acertou,
-        0 if acertou else 1,
-        tentativa_id
-    ))
+        """,
+        (
+            pontos,
+            acertou,
+            0 if acertou else 1,
+            tentativa_id,
+        ),
+    )
 
     conn.commit()
     conn.close()
@@ -329,7 +335,7 @@ def responder():
         "resposta_usuario": resposta_usuario,
         "acertou": acertou,
         "pontos": pontos,
-        "usou_dica": usou_dica
+        "usou_dica": usou_dica,
     }
 
     return redirect(url_for("feedback"))
@@ -346,14 +352,17 @@ def feedback():
     cursor = conn.cursor()
     p = placeholder()
 
-    cursor.execute(f"""
+    cursor.execute(
+        f"""
         SELECT 
             q.*,
             a.nome AS assunto
         FROM questoes q
         JOIN assuntos a ON q.assunto_id = a.id
         WHERE q.id = {p}
-    """, (dados["questao_id"],))
+        """,
+        (dados["questao_id"],),
+    )
 
     questao = fetchone(cursor)
     conn.close()
@@ -382,7 +391,8 @@ def resultado():
     cursor = conn.cursor()
     p = placeholder()
 
-    cursor.execute(f"""
+    cursor.execute(
+        f"""
         SELECT 
             t.*,
             f.nome AS faixa_etaria,
@@ -392,15 +402,20 @@ def resultado():
         JOIN faixas_etarias f ON t.faixa_etaria_id = f.id
         LEFT JOIN grupos_perfil g ON t.grupo_perfil_id = g.id
         WHERE t.id = {p}
-    """, (tentativa_id,))
+        """,
+        (tentativa_id,),
+    )
 
     tentativa = fetchone(cursor)
 
-    cursor.execute(f"""
+    cursor.execute(
+        f"""
         UPDATE tentativas
         SET finalizada = 1
         WHERE id = {p}
-    """, (tentativa_id,))
+        """,
+        (tentativa_id,),
+    )
 
     conn.commit()
     conn.close()
@@ -410,13 +425,13 @@ def resultado():
     if tentativa["total_questoes"] > 0:
         percentual = round(
             (tentativa["total_acertos"] / tentativa["total_questoes"]) * 100,
-            2
+            2,
         )
 
     return render_template(
         "resultado.html",
         tentativa=tentativa,
-        percentual=percentual
+        percentual=percentual,
     )
 
 
@@ -438,7 +453,7 @@ def estatisticas():
         por_faixa_grupo=por_faixa_grupo,
         por_assunto=por_assunto,
         por_idade_assunto=por_idade_assunto,
-        mais_erradas=mais_erradas
+        mais_erradas=mais_erradas,
     )
 
 
@@ -454,5 +469,4 @@ def reiniciar():
 
 
 if __name__ == "__main__":
-    create_database()
     app.run(debug=True)
