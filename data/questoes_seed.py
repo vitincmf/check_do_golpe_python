@@ -1,5 +1,9 @@
 import sys
 from pathlib import Path
+import psycopg2
+from dotenv import load_dotenv
+load_dotenv()
+
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
@@ -2484,8 +2488,14 @@ QUESTOES = [
 
 def get_assunto_id(cursor, nome):
     p = placeholder()
-    cursor.execute(f"SELECT id FROM assuntos WHERE nome = {p}", (nome,))
+
+    cursor.execute(
+        f"SELECT id FROM assuntos WHERE nome = {p}",
+        (nome,)
+    )
+
     assunto = fetchone(cursor)
+
     return assunto["id"] if assunto else None
 def misturar_dominios():
     substituicoes = {
@@ -2532,6 +2542,8 @@ def seed_questoes():
 
     conn = get_connection()
     cursor = conn.cursor()
+    #cursor.execute("SELECT current_database() AS db, current_schema() AS schema, current_user AS usuario, inet_server_addr() AS ip")
+    #print("CONEXÃO REAL:", fetchone(cursor))
     p = placeholder()
 
 
@@ -2604,21 +2616,26 @@ def seed_questoes():
 
         inseridas += 1
 
-    conn.commit()
-
-    cursor.execute("SELECT COUNT(*) AS total FROM questoes")
+   # CONTAR QUESTÕES NO BANCO
+    cursor.execute("SELECT COUNT(*) AS total FROM public.questoes")
     linha = fetchone(cursor)
     print("BANCO REAL - QUESTÕES:", linha["total"])
 
-    cursor.execute("SELECT COUNT(*) AS total FROM assuntos")
+
+    # CONTAR ASSUNTOS NO BANCO
+    cursor.execute("SELECT COUNT(*) AS total FROM public.assuntos")
     linha = fetchone(cursor)
     print("BANCO REAL - ASSUNTOS:", linha["total"])
 
+
     print("NOVAS QUESTÕES:", inseridas)
 
+
+    conn.commit()
     conn.close()
 
-    print("Questões inseridas com sucesso!")
+
+    print("Seed finalizado com sucesso!")
 
 
 if __name__ == "__main__":

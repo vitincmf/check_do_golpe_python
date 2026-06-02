@@ -1,170 +1,51 @@
-import sys
-from pathlib import Path
+import os
+import psycopg2
+from dotenv import load_dotenv
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT_DIR))
+load_dotenv()
 
-from database import get_connection, create_database, placeholder, fetchone
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-print("USANDO DATABASE.PY:", ROOT_DIR / "database.py")
+if not DATABASE_URL:
+    raise Exception("DATABASE_URL não encontrada no .env")
 
-def seed_database():
+conn = psycopg2.connect(DATABASE_URL)
+cursor = conn.cursor()
 
-    create_database()
+print("POSTGRES ATIVO:", True)
 
-    conn = get_connection()
-    cursor = conn.cursor()
-    p = placeholder()
+assuntos = [
+    ("Golpes bancários", "Fraudes envolvendo bancos, contas, cartões, senhas e falsos atendimentos."),
+    ("Sites falsos / E-commerce fake", "Golpes envolvendo lojas virtuais falsas, ofertas irreais e compras online fraudulentas."),
+    ("Correios e entregas", "Golpes envolvendo rastreamento falso, taxas indevidas e falsas mensagens de entrega."),
+    ("Phishing por e-mail", "Mensagens falsas por e-mail usadas para roubar dados, senhas ou induzir cliques suspeitos."),
+    ("WhatsApp e redes sociais", "Golpes aplicados por mensagens, perfis falsos, contatos clonados e redes sociais."),
+    ("Pix e pagamentos", "Fraudes envolvendo Pix, QR Code, comprovantes falsos e pagamentos antecipados."),
+    ("Falsos investimentos", "Promessas falsas de lucro rápido, retorno garantido e oportunidades financeiras fraudulentas."),
+    ("Golpes com dados pessoais", "Golpes que tentam obter CPF, documentos, fotos, dados bancários e informações sensíveis."),
+    ("IA, Deepfake e Engenharia Social", "Golpes modernos usando inteligência artificial, clonagem de voz, deepfake e manipulação social.")
+]
 
-    print("Iniciando seed...")
+for nome, descricao in assuntos:
+    cursor.execute(
+        """
+        INSERT INTO assuntos (nome, descricao)
+        VALUES (%s, %s)
+        ON CONFLICT (nome)
+        DO UPDATE SET descricao = EXCLUDED.descricao
+        """,
+        (nome, descricao)
+    )
 
-    # =====================
-    # FAIXAS ETÁRIAS
-    # =====================
+conn.commit()
 
-    faixas = [
-        "Até 17 anos",
-        "18 a 29 anos",
-        "30 a 49 anos",
-        "50 anos ou mais"
-    ]
+cursor.execute("SELECT COUNT(*) FROM assuntos")
+total = cursor.fetchone()[0]
 
-    for faixa in faixas:
-        cursor.execute(
-            f"""
-            INSERT INTO faixas_etarias (nome)
-            VALUES ({p})
-            ON CONFLICT (nome) DO NOTHING
-            """,
-            (faixa,)
-        )
+print("---------------------")
+print("SEED FINALIZADO")
+print("ASSUNTOS NO BANCO:", total)
+print("---------------------")
 
-
-    # =====================
-    # GRUPOS
-    # =====================
-
-    grupos_perfil = [
-
-        (
-            "Grupo 1",
-            "Pouca experiência",
-            "Raramente compra online, usa pouco a internet, pode ter dificuldade com tecnologia.",
-            "Principal público-alvo do golpe."
-        ),
-
-        (
-            "Grupo 2",
-            "Experiência moderada",
-            "Compra online às vezes, usa redes sociais e aplicativos.",
-            "Perfil intermediário."
-        ),
-
-        (
-            "Grupo 3",
-            "Experiência frequente",
-            "Compra online regularmente e reconhece ameaças digitais.",
-            "Usuário mais preparado digitalmente."
-        )
-
-    ]
-
-
-    for grupo in grupos_perfil:
-        cursor.execute(
-            f"""
-            INSERT INTO grupos_perfil
-            (
-                nome,
-                perfil,
-                caracteristicas,
-                relevancia
-            )
-            VALUES ({p},{p},{p},{p})
-            ON CONFLICT (nome) DO NOTHING
-            """,
-            grupo
-        )
-
-
-    # =====================
-    # ASSUNTOS
-    # =====================
-
-    assuntos = [
-
-        (
-            "Golpes bancários",
-            "Fraudes envolvendo bancos e dados financeiros."
-        ),
-
-        (
-            "Sites falsos / E-commerce fake",
-            "Lojas falsas e páginas clonadas."
-        ),
-
-        (
-            "Correios e entregas",
-            "Golpes de rastreamento e taxas falsas."
-        ),
-
-        (
-            "Phishing por e-mail",
-            "Mensagens falsas roubando informações."
-        ),
-
-        (
-            "WhatsApp e redes sociais",
-            "Perfis falsos e mensagens fraudulentas."
-        ),
-
-        (
-            "Pix e pagamentos",
-            "Golpes envolvendo pagamentos digitais."
-        ),
-
-        (
-            "Falsos investimentos",
-            "Promessas falsas de lucro rápido."
-        ),
-
-        (
-            "Golpes com dados pessoais",
-            "Roubo de CPF e informações privadas."
-        ),
-
-        (
-            "IA, Deepfake e Engenharia Social",
-            "Golpes modernos usando inteligência artificial."
-        )
-
-    ]
-
-
-    for assunto in assuntos:
-        cursor.execute(
-            f"""
-            INSERT INTO assuntos
-            (
-                nome,
-                descricao
-            )
-            VALUES ({p},{p})
-            ON CONFLICT (nome) DO NOTHING
-            """,
-            assunto
-        )
-
-
-    conn.commit()
-    conn.close()
-
-    print("SEED FINALIZADO COM SUCESSO!")
-
-
-def inserir_dados():
-    seed_database()
-
-
-if __name__ == "__main__":
-    seed_database()
+cursor.close()
+conn.close()
