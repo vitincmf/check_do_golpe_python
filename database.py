@@ -85,6 +85,14 @@ def fetchall(cursor):
     return rows
 
 
+def ensure_sqlite_column(cursor, table_name, column_name, column_definition):
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns = [row["name"] for row in cursor.fetchall()]
+
+    if column_name not in columns:
+        cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_definition}")
+
+
 def create_database():
     conn = get_connection()
     cursor = conn.cursor()
@@ -267,6 +275,9 @@ def create_database():
                 respondida_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        ensure_sqlite_column(cursor, "usuarios", "grupo_perfil_id", "INTEGER")
+        ensure_sqlite_column(cursor, "tentativas", "grupo_perfil_id", "INTEGER")
 
     conn.commit()
     conn.close()
