@@ -3,45 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#6c5ce7">
+<meta name="theme-color" content="#101727">
 <link rel="manifest" href="/static/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/style.css">
 <title>Feedback - Check do Golpe</title>
 </head>
 <body>
-<main class="app">
-<section class="card">
-    {% if dados.acertou %}
-        <div class="feedback correto">
-            <h1>Correto!</h1>
-            <p>Você identificou corretamente o cenário.</p>
+<main class="app quiz-app">
+    <section class="app-shell feedback-screen">
+        <header class="case-header compact">
+            <div class="case-kicker">Relatório do caso {{ numero }} de {{ total }}</div>
+            <div class="progress-track" aria-label="Progresso do quiz">
+                <div class="progress-fill" style="width: {{ (numero / total) * 100 }}%;"></div>
+            </div>
+        </header>
+
+        <section class="report-card {{ 'report-ok' if dados.acertou else 'report-bad' }}">
+            <span class="report-badge">{{ "Acertou" if dados.acertou else "Aprendizado" }}</span>
+            {% if dados.acertou %}
+                <h1>Boa leitura do cenário.</h1>
+                <p>Você identificou corretamente os sinais deste caso.</p>
+            {% else %}
+                <h1>Quase. Vamos destrinchar.</h1>
+                <p>Essa resposta não foi a correta, mas o relatório mostra o que observar.</p>
+            {% endif %}
+        </section>
+
+        <section class="case-card compact-card">
+            <div class="address-bar">
+                <span>Origem</span>
+                <strong>{{ questao.url_simulada }}</strong>
+            </div>
+            <div class="case-body">
+                <small>{{ questao.assunto }}</small>
+                <h2>{{ questao.titulo }}</h2>
+                <p>{{ questao.descricao }}</p>
+            </div>
+        </section>
+
+        <article class="explanation-card">
+            <span class="eyebrow dark">Explicação</span>
+            <p>{{ questao.explicacao }}</p>
+        </article>
+
+        {% if dados.usou_dica %}
+            <p class="aviso">Você usou dica, por isso a pontuação foi reduzida.</p>
+        {% endif %}
+
+        <div class="score-strip">
+            <span>Pontuação atual</span>
+            <strong>{{ pontuacao_atual }} pts</strong>
+            <small>{{ numero }} / {{ total }} questões</small>
         </div>
-    {% else %}
-        <div class="feedback errado">
-            <h1>Ops! Era outra resposta.</h1>
-            <p>Essa questão serviu como aprendizado.</p>
-        </div>
-    {% endif %}
 
-    <small class="assunto">{{ questao.assunto }}</small>
-
-    <div class="site-fake">
-        <div class="browser-bar">{{ questao.url_simulada }}</div>
-        <h2>{{ questao.titulo }}</h2>
-        <p>{{ questao.descricao }}</p>
-    </div>
-
-    <h3>Explicação</h3>
-    <p>{{ questao.explicacao }}</p>
-
-    <div class="pontuacao">Pontuação obtida: <strong>{{ dados.pontos }} pontos</strong></div>
-
-    {% if dados.usou_dica %}
-        <p class="aviso">Você usou dica, por isso a pontuação foi reduzida.</p>
-    {% endif %}
-
-    <a href="/proxima" class="btn">Próxima Questão</a>
-</section>
+        <a href="/proxima" class="primary-btn">Próxima questão</a>
+        <p class="microcopy">{{ "Continue nesse ritmo." if dados.acertou else "Cada erro melhora seu radar." }}</p>
+    </section>
 </main>
 <script src="/static/js/install.js"></script>
 <script>

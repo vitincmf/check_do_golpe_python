@@ -3,42 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#6c5ce7">
+<meta name="theme-color" content="#101727">
 <link rel="manifest" href="/static/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/style.css">
 <title>Resultado - Check do Golpe</title>
 </head>
 <body>
-<main class="app">
-<section class="card resultado">
-    <div class="trofeu">🏆</div>
-    <h1>Quiz Concluído!</h1>
-    <p>Você finalizou a simulação educativa.</p>
+<main class="app home-app">
+    <section class="app-shell result-screen">
+        <header class="home-hero result-hero">
+            <span class="eyebrow">Rodada concluída</span>
+            <h1>Seu radar de golpes</h1>
+            <p>Veja como você se saiu e continue treinando para reconhecer sinais suspeitos mais rápido.</p>
+        </header>
 
-    <div class="resultado-box">
-        <h2>{{ tentativa.pontuacao_total }} pontos</h2>
-        <p>{{ tentativa.total_acertos }} acertos de {{ tentativa.total_questoes }} questões</p>
-        <p>{{ percentual }}% de aproveitamento</p>
-    </div>
+        <section class="score-card">
+            <span>Sua pontuação</span>
+            <strong>{{ tentativa.pontuacao_total }} pts</strong>
+            <p>{{ tentativa.total_acertos }} de {{ tentativa.total_questoes }} acertos • {{ percentual }}% de aproveitamento</p>
+            <div class="score-progress">
+                <div style="width: {{ percentual }}%;"></div>
+            </div>
+        </section>
 
-    <div class="resumo">
-        <div><strong>{{ tentativa.total_acertos }}</strong><span>Acertos</span></div>
-        <div><strong>{{ tentativa.total_erros }}</strong><span>Erros</span></div>
-    </div>
+        <div class="resumo">
+            <div>
+                <strong>{{ tentativa.total_acertos }}</strong>
+                <span>Acertos</span>
+            </div>
+            <div>
+                <strong>{{ tentativa.total_erros }}</strong>
+                <span>Erros</span>
+            </div>
+        </div>
 
-    <p>Faixa etária: <strong>{{ tentativa.faixa_etaria }}</strong></p>
+        <section class="insight-card">
+            {% if percentual >= 80 %}
+                <h2>Excelente leitura de risco.</h2>
+                <p>Você mostrou atenção aos sinais e está bem preparado para identificar golpes digitais.</p>
+            {% elif percentual >= 50 %}
+                <h2>Bom desempenho.</h2>
+                <p>Você já reconhece vários indícios. Continue praticando para ganhar consistência.</p>
+            {% else %}
+                <h2>Seu radar está em treino.</h2>
+                <p>Revise as explicações e jogue novamente para fortalecer sua análise.</p>
+            {% endif %}
+        </section>
 
-    {% if percentual >= 80 %}
-        <p class="mensagem">Parabéns! Você está bem preparado para identificar golpes digitais.</p>
-    {% elif percentual >= 50 %}
-        <p class="mensagem">Bom resultado! Continue praticando.</p>
-    {% else %}
-        <p class="mensagem">Continue treinando. A prática ajuda a identificar golpes com mais segurança.</p>
-    {% endif %}
+        <p class="profile-line">Faixa etária: <strong>{{ tentativa.faixa_etaria }}</strong></p>
 
-    <a href="/reiniciar" class="btn">Jogar Novamente</a>
-    <a href="/estatisticas" class="btn secondary">Ver Estatísticas</a>
-</section>
+        <a href="/reiniciar" class="primary-btn">Jogar novamente</a>
+        <a href="/estatisticas" class="secondary-btn">Ver estatísticas</a>
+    </section>
 </main>
 <script src="/static/js/install.js"></script>
 <script>
