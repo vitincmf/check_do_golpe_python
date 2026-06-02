@@ -30,11 +30,6 @@ def debug_database_url():
 
 debug_database_url()
 
-def get_database_url():
-    return os.getenv("DATABASE_URL", "").strip()
-print("DATABASE_URL:", get_database_url()[:20])
-print("POSTGRES ATIVO:", get_database_url().startswith("postgres"))
-
 
 def is_postgres():
     return psycopg2 is not None and get_database_url().startswith("postgres")
