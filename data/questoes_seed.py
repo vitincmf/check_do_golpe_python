@@ -2603,20 +2603,21 @@ def seed_questoes():
         )
 
         inseridas += 1
-    
+
     conn.commit()
 
     cursor.execute("SELECT COUNT(*) AS total FROM questoes")
     linha = fetchone(cursor)
-    print("BANCO REAL - QUESTÕES:", linha)
+    print("BANCO REAL - QUESTÕES:", linha["total"])
 
     cursor.execute("SELECT COUNT(*) AS total FROM assuntos")
     linha = fetchone(cursor)
-    print("BANCO REAL - ASSUNTOS:", linha)
+    print("BANCO REAL - ASSUNTOS:", linha["total"])
+
+    print("NOVAS QUESTÕES:", inseridas)
 
     conn.close()
 
-    print("NOVAS QUESTÕES:", inseridas)
     print("Questões inseridas com sucesso!")
 
 
