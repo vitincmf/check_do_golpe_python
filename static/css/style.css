@@ -1176,3 +1176,24 @@ tr:nth-child(even) {
         gap: 10px;
     }
 }
+.sobre-lista {
+    margin-top: 14px;
+    display: grid;
+    gap: 10px;
+    list-style: none;
+}
+
+.sobre-lista li {
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    padding: 12px;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-weight: 900;
+}
+
+.sobre-texto {
+    margin-top: 14px;
+    color: rgba(255,255,255,0.78);
+    line-height: 1.4;
+}

@@ -380,6 +380,9 @@ def feedback():
         pontuacao_atual=tentativa["pontuacao_total"] if tentativa else 0
     )
 
+@app.route("/sobre")
+def sobre():
+    return render_template("sobre.html")
 
 @app.route("/proxima")
 def proxima():
